@@ -309,6 +309,7 @@ button, select, input, textarea { font: inherit; color: inherit; }
   background: var(--fd-surface); border: 1px solid var(--fd-border); border-radius: var(--fd-radius);
 }
 .panel--flush { padding: 0; overflow: hidden; }
+.panel[tabindex="-1"]:focus { outline: none; }
 .panel__head { display: flex; align-items: center; gap: 10px; min-height: 28px; margin-bottom: 14px; flex-wrap: wrap; }
 .panel__icon { width: 22px; height: 22px; color: var(--fd-brand); }
 .panel__title { font-size: var(--fd-text-xl); font-weight: var(--fd-font-weight-semibold); letter-spacing: -0.01em; line-height: 1.3; }
@@ -418,6 +419,7 @@ button, select, input, textarea { font: inherit; color: inherit; }
 .input:focus, .select:focus, .textarea:focus { outline: none; border-color: var(--fd-brand); box-shadow: 0 0 0 3px var(--fd-accent-100); }
 .textarea { height: auto; min-height: 60px; padding: var(--fd-space-2) var(--fd-space-3); resize: vertical; line-height: 1.5; }
 .textarea[readonly] { background: var(--fd-gray-50); color: var(--fd-text-2); }
+.textarea:disabled, .textarea:disabled:hover { border-color: var(--fd-gray-200); background: var(--fd-gray-50); color: var(--fd-text-2); cursor: not-allowed; resize: none; }
 .select { appearance: none; padding-right: 30px; cursor: pointer; }
 .selectwrap { position: relative; display: inline-block; min-width: 0; }
 .selectwrap .ic { position: absolute; right: 8px; top: 50%; translate: 0 -50%; width: 18px; height: 18px; color: var(--fd-text-3); pointer-events: none; }
@@ -611,6 +613,7 @@ a.qitem:hover { background: var(--fd-hover); }
 .cov__actions { display: flex; gap: var(--fd-space-2); flex-wrap: wrap; }
 .cprompt { display: flex; flex-direction: column; gap: var(--fd-space-2); margin-top: var(--fd-space-5); padding-top: var(--fd-space-4); border-top: 1px solid var(--fd-border-2); }
 .cprompt__head { display: flex; align-items: center; justify-content: space-between; gap: var(--fd-space-3); }
+.cprompt__label { display: flex; align-items: center; flex-wrap: wrap; gap: var(--fd-space-2); }
 .cprompt .textarea { min-height: 120px; font-size: var(--fd-text-sm); }
 
 .feed { display: flex; flex-direction: column; }
@@ -2078,8 +2081,8 @@ function coverHTML(p) {
       </div>
     </div>
     <div class="cprompt">
-      <div class="cprompt__head"><label class="sub" for="prompt-${p.id}">Prompt de l’image</label><button class="btn btn--sm" type="button" data-action="copy-prompt" data-id="${p.id}" ${p.prompt.trim() ? '' : 'disabled'}>${ic('content_copy')}Copier le prompt</button></div>
-      <textarea class="textarea" id="prompt-${p.id}" data-input="prompt" data-id="${p.id}" placeholder="${esc(A().routine ? `Écrivez ici le prompt de l’image. Sinon, la routine le proposera ${routineWhen(p)}.` : 'Écrivez ici le prompt qui servira à créer l’image.')}" ${locked ? 'readonly' : ''}>${esc(p.prompt)}</textarea>
+      <div class="cprompt__head"><span class="cprompt__label"><label class="sub" for="prompt-${p.id}">Prompt de l’image</label><span class="tag">${ic('smart_toy')}Écrit par la routine</span></span><button class="btn btn--sm" type="button" data-action="copy-prompt" data-id="${p.id}" ${p.prompt.trim() ? '' : 'disabled'}>${ic('content_copy')}Copier le prompt</button></div>
+      <textarea class="textarea" id="prompt-${p.id}" placeholder="${esc(A().routine ? `La routine écrira le prompt ${routineWhen(p)}.` : 'Le prompt sera écrit par la routine du compte.')}" disabled>${esc(p.prompt)}</textarea>
     </div>
   </section>`;
 }
@@ -2713,7 +2716,6 @@ document.addEventListener('change', e => {
   const t = e.target;
   if (t.dataset.filter) { state.filters[t.dataset.filter] = t.value; render(); view.querySelector(`[data-filter="${t.dataset.filter}"]`)?.focus(); return; }
   if (t.dataset.input === 'text') { const p = post(t.dataset.id); if (p) logH(p, 'Texte modifié'); return; }
-  if (t.dataset.input === 'prompt') { const p = post(t.dataset.id); if (p) logH(p, 'Prompt de l’image modifié'); return; }
   if (t.dataset.draft === 'type') { state.draft.type = t.value; return; }
   if (t.dataset.team) {
     const m = state.draft.team[t.dataset.k];
@@ -2779,7 +2781,6 @@ document.addEventListener('input', e => {
   if (t.dataset.draft && t.dataset.draft !== 'type') { state.draft[t.dataset.draft] = t.value; return; }
   if (t.dataset.draftSeries) { state.draft.series[+t.dataset.i][t.dataset.draftSeries] = t.value; return; }
   if (t.dataset.input === 'voice') { A().voice = t.value; return; }
-  if (t.dataset.input === 'prompt') { const p = post(t.dataset.id); if (p) { p.prompt = t.value; const b = view.querySelector('[data-action="copy-prompt"]'); if (b) b.disabled = !t.value.trim(); } return; }
   if (t.dataset.input !== 'text') return;
   const p = post(t.dataset.id);
   p.text = t.value;
