@@ -592,8 +592,6 @@ a.qitem:hover { background: var(--fd-hover); }
 .fhead__actions .link { margin-left: var(--fd-space-2); font-size: var(--fd-text-sm); }
 .fhead__actions { display: flex; align-items: center; gap: var(--fd-space-2); flex-wrap: wrap; }
 .fhead__path { padding-top: var(--fd-space-4); border-top: 1px solid var(--fd-border-2); }
-.fbody { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: var(--fd-space-5); align-items: start; }
-.fbody__side { position: sticky; top: var(--fd-space-4); }
 
 .textarea--post { min-height: 180px; overflow: hidden; font-size: var(--fd-text-base); line-height: 1.55; }
 .counter { margin-left: auto; font-size: var(--fd-text-sm); font-weight: var(--fd-font-weight-medium); color: var(--fd-text-2); font-variant-numeric: tabular-nums; }
@@ -991,6 +989,7 @@ input[type="radio"] { width: 16px; height: 16px; margin: 2px 0 0; accent-color: 
   display: flex; flex-direction: column;
   width: var(--fd-peek-width);
   background: var(--fd-surface); border-left: 1px solid var(--fd-border); box-shadow: var(--fd-shadow-lg);
+  view-transition-name: post-sheet;
 }
 .peek.is-entering { animation: peek-in var(--fd-dur) var(--fd-ease-out); }
 @keyframes peek-in { from { opacity: 0; transform: translateX(40px); } }
@@ -1001,9 +1000,9 @@ input[type="radio"] { width: 16px; height: 16px; margin: 2px 0 0; accent-color: 
 .peek__copy { margin-left: auto; }
 .peek__body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0 var(--fd-space-6) var(--fd-space-8); }
 .peek__body:focus { outline: none; }
-.peek .panel { padding: var(--fd-space-5) 0; border: 0; border-top: 1px solid var(--fd-border-2); border-radius: 0; background: none; }
-.peek .panel:first-child { border-top: 0; padding-top: var(--fd-space-6); }
-.peek .fhead__top { flex-direction: column; align-items: stretch; }
+.sheet .panel { padding: var(--fd-space-5) 0; border: 0; border-top: 1px solid var(--fd-border-2); border-radius: 0; background: none; }
+.sheet .panel:first-child { border-top: 0; padding-top: var(--fd-space-6); }
+.sheet .fhead__top { flex-direction: column; align-items: stretch; }
 /* Le post ouvert dans le panneau, repéré dans la liste derrière */
 .table tbody tr.is-peeked { background: var(--fd-accent-50); }
 .table tr.is-peeked .tlink, .row--link.is-peeked .row__title, .next__title a.is-peeked, .spost__title.is-peeked { color: var(--fd-brand-hover); }
@@ -1018,6 +1017,37 @@ body:has(.peek) .toast-zone { left: calc(100% - var(--fd-peek-width) / 2); }
   .peek { inset: 0; width: auto; border-left: 0; }
   .peek__body { padding: 0 var(--fd-space-4) var(--fd-space-8); }
   .peek__full, .peek__full + .peek__sep { display: none; }
+}
+
+/* ---------- Pleine page d'un post : une page de 3e niveau ---------- */
+.main.is-page { max-width: none; padding: 0; gap: 0; }
+.main.is-page > .demo, .main.is-page > .mod { display: none; }
+.page { min-height: 100vh; background: var(--fd-surface); view-transition-name: post-sheet; }
+.page__bar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: var(--fd-space-2); height: 52px; padding: 0 var(--fd-space-4) 0 var(--fd-space-3); border-bottom: 1px solid var(--fd-border-2); background: var(--fd-surface); }
+.page__bar .icon-btn .ic { width: 20px; height: 20px; }
+.page__bar .crumbs { min-width: 0; }
+.page__bar .crumbs > a, .page__bar .crumbs > .ic { flex: none; white-space: nowrap; }
+.page__bar .crumbs [aria-current] { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.page__copy { margin-left: auto; }
+.page__body { max-width: 880px; margin: 0 auto; padding: 0 var(--fd-space-8) 96px; }
+.page__body > .panel:first-child { padding-top: var(--fd-space-8); }
+/* Ouvrir en pleine page : le side peek s'agrandit jusqu'à devenir la page, et la flèche de retour fait l'inverse (View Transitions). */
+::view-transition-group(post-sheet) { animation-duration: 360ms; animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1); overflow: clip; background: #fff; box-shadow: 0 12px 32px rgb(24 27 33 / 12%); }
+::view-transition-old(post-sheet), ::view-transition-new(post-sheet) { height: 100%; object-fit: none; object-position: left top; }
+::view-transition-old(post-sheet) { animation: 90ms ease-out both sheet-out; }
+::view-transition-new(post-sheet) { animation: 210ms 110ms ease-out both sheet-in; }
+@keyframes sheet-out { to { opacity: 0; } }
+@keyframes sheet-in { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+}
+@media (max-width: 1100px) {
+  .page { min-height: calc(100vh - 56px); }
+  .page__bar { top: 56px; }
+}
+@media (max-width: 680px) {
+  .page__body { padding: 0 var(--fd-space-4) 96px; }
+  .page__bar .crumbs > a, .page__bar .crumbs > .ic { display: none; }
 }
 
 /* ---------- Adaptation ---------- */
@@ -1039,7 +1069,6 @@ body:has(.peek) .toast-zone { left: calc(100% - var(--fd-peek-width) / 2); }
   .mtop__logo { height: 22px; width: auto; aspect-ratio: 3966 / 540; }
   .mtop .icon-btn { width: 40px; height: 40px; margin-left: calc(var(--fd-space-2) * -1); color: var(--fd-text-1); }
   .mtop .icon-btn .ic { width: 24px; height: 24px; }
-  .fbody { grid-template-columns: minmax(0, 1fr) 340px; }
   .val { grid-template-columns: minmax(0, 1fr) 320px; gap: var(--fd-space-4); }
   .val__preview { padding: var(--fd-space-4) var(--fd-space-3); }
   .cov { grid-template-columns: 160px minmax(0, 1fr); }
@@ -1048,10 +1077,10 @@ body:has(.peek) .toast-zone { left: calc(100% - var(--fd-peek-width) / 2); }
   .table .col-assign { display: none; }
 }
 @media (max-width: 960px) {
-  .todo, .fbody, .val, .set, .cons { grid-template-columns: minmax(0, 1fr); }
+  .todo, .val, .set, .cons { grid-template-columns: minmax(0, 1fr); }
   .prevsel { flex-wrap: wrap; }
   .prevsel .selectwrap { width: 100%; }
-  .fbody__side, .val__side { position: static; }
+  .val__side { position: static; }
   .path { grid-template-columns: minmax(0, 1fr); gap: 2px; }
   .path__step { display: grid; grid-template-columns: var(--fd-path-mark) minmax(0, 1fr); column-gap: var(--fd-space-3); padding: 6px 10px; }
   .path__step::before { display: none; }
@@ -1765,6 +1794,8 @@ function renderHeader(r) {
   const mod = document.getElementById('mod');
   if (r.name === 'comptes') {
     mod.innerHTML = `<div class="mod__bar"><h1 class="mod__title" id="mod-title">Comptes LinkedIn</h1><a class="btn btn--primary" href="#nouveau-compte">${ic('add')}Nouveau compte</a></div>`;
+  } else if (r.name === 'post') {
+    mod.innerHTML = '';
   } else if (r.name === 'nouveau-compte') {
     mod.innerHTML = `<nav class="crumbs" aria-label="Fil d’Ariane"><a href="#comptes">Comptes LinkedIn</a>${ic('chevron_right')}<span aria-current="page">Nouveau compte</span></nav>
       <h1 class="mod__title" id="mod-title">Nouveau compte LinkedIn</h1>`;
@@ -2105,13 +2136,13 @@ function headerActions(p) {
   if (p.status === 'PUBLIE') return '';
   return preview(true);
 }
-function fheadHTML(p) {
+function fheadHTML(p, level = 2) {
   const locked = ['PROGRAMME', 'PUBLIE'].includes(p.status);
   const flash = state.flash === p.id ? 'is-arrived' : '';
   return `<section class="panel fhead" aria-labelledby="post-title">
       <div class="fhead__top">
         <div class="fhead__main">
-          <h2 class="fhead__title" id="post-title" tabindex="-1">${esc(p.title)}</h2>
+          <h${level} class="fhead__title" id="post-title" tabindex="-1">${esc(p.title)}</h${level}>
           <p class="fhead__meta">${pill(p.status, false, flash)}</p>
           <div class="fhead__row"><label class="fhead__label" for="post-serie">Série</label><span class="selectwrap"><select class="select select--sm" id="post-serie" data-change="move-serie" data-id="${p.id}" ${p.status === 'PUBLIE' ? 'disabled' : ''}>${serieOptions(p.serie)}</select>${ic('expand_more')}</span></div>
           ${assignHTML(p)}
@@ -2129,17 +2160,20 @@ function fheadHTML(p) {
     </section>`;
 }
 const NO_POST = `<div class="empty-wide"><svg class="mark" aria-hidden="true"><use href="#mark"/></svg><strong>Ce post n’existe pas dans ce compte.</strong><p>Il a peut-être été supprimé. Retrouvez tous les posts dans la liste.</p><a class="btn" href="#posts">Voir les posts</a></div>`;
+/* Pleine page : la fiche devient une page de 3e niveau. Plus d'en-tête de compte ni d'onglets :
+   le menu FlowDesk à gauche, une barre avec la flèche de retour, le fil d'Ariane et le lien, puis la fiche. */
 function viewPost(id) {
   const p = post(id);
-  if (!p) return NO_POST;
-  return `<div class="stack">
-    <a class="back" href="${backTo.hash}">${ic('arrow_back')}${backTo.label}</a>
-    ${fheadHTML(p)}
-    <div class="fbody">
-      <div class="stack">${textHTML(p)}${coverHTML(p)}</div>
-      <aside class="fbody__side">${feedHTML(p)}</aside>
+  const back = `<a class="icon-btn page__back" href="${backTo.hash}" data-morph aria-label="${esc(backTo.label)}" title="${esc(backTo.label)}">${ic('arrow_back')}</a>`;
+  if (!p) return `<article class="page"><div class="page__bar">${back}</div><div class="page__body">${NO_POST}</div></article>`;
+  return `<article class="sheet page" aria-labelledby="post-title">
+    <div class="page__bar">
+      ${back}
+      <nav class="crumbs" aria-label="Fil d’Ariane"><a href="#comptes">Comptes LinkedIn</a>${ic('chevron_right')}<a href="#a-faire">${esc(A().name)}</a>${ic('chevron_right')}<span aria-current="page">${esc(p.title)}</span></nav>
+      <button class="icon-btn page__copy" type="button" data-action="post-link" aria-label="Copier le lien du post" title="Copier le lien du post">${ic('link')}</button>
     </div>
-  </div>`;
+    <div class="page__body">${fheadHTML(p, 1)}${textHTML(p)}${coverHTML(p)}${feedHTML(p)}</div>
+  </article>`;
 }
 
 /* ---------- Panneau d'un post : la même fiche, ouverte à droite de la liste ---------- */
@@ -2147,14 +2181,14 @@ function peekHTML(id) {
   const p = post(id);
   const bar = `<div class="peek__bar">
       <button class="icon-btn" type="button" data-action="peek-close" aria-label="Fermer la fiche" title="Fermer (Échap)">${ic('close')}</button>
-      ${p ? `<a class="icon-btn peek__full" href="#post/${p.id}" aria-label="Ouvrir en pleine page" title="Ouvrir en pleine page">${ic('open_in_full')}</a>` : ''}
+      ${p ? `<a class="icon-btn peek__full" href="#post/${p.id}" data-morph aria-label="Ouvrir en pleine page" title="Ouvrir en pleine page">${ic('open_in_full')}</a>` : ''}
       <span class="peek__sep" aria-hidden="true"></span>
       <button class="icon-btn" type="button" data-action="peek-prev" aria-label="Post précédent" disabled>${ic('expand_less')}</button>
       <button class="icon-btn" type="button" data-action="peek-next" aria-label="Post suivant" disabled>${ic('expand_more')}</button>
-      ${p ? `<button class="icon-btn peek__copy" type="button" data-action="peek-link" aria-label="Copier le lien du post" title="Copier le lien du post">${ic('link')}</button>` : ''}
+      ${p ? `<button class="icon-btn peek__copy" type="button" data-action="post-link" aria-label="Copier le lien du post" title="Copier le lien du post">${ic('link')}</button>` : ''}
     </div>`;
   const body = p ? `${fheadHTML(p)}${textHTML(p)}${coverHTML(p)}${feedHTML(p)}` : NO_POST;
-  return `<aside class="peek" id="peek" role="dialog" aria-modal="false" ${p ? 'aria-labelledby="post-title"' : 'aria-label="Fiche du post"'}>
+  return `<aside class="peek sheet" id="peek" role="dialog" aria-modal="false" ${p ? 'aria-labelledby="post-title"' : 'aria-label="Fiche du post"'}>
     ${bar}
     <div class="peek__body" id="peek-body">${body}</div>
   </aside>`;
@@ -2436,6 +2470,7 @@ function render() {
   const keep = !changed && !peekChanged && ae && ae.id && view.contains(ae) ? { id: ae.id, s: ae.selectionStart, e: ae.selectionEnd } : null;
   const peekScroll = !changed && !peekChanged ? document.getElementById('peek-body')?.scrollTop : null;
   renderHeader(r);
+  document.getElementById('contenu').classList.toggle('is-page', r.name === 'post');
   let html;
   if (r.name === 'comptes') html = viewAccounts();
   else if (r.name === 'nouveau-compte') html = viewNewAccount();
@@ -2499,7 +2534,7 @@ function openAccount(id) {
   state.cal = { y: TODAY.getFullYear(), m: TODAY.getMonth() };
   backTo = { hash: '#a-faire', label: 'Retour à « À faire »' };
 }
-window.addEventListener('hashchange', () => {
+function onRoute() {
   const h = decodeURIComponent(location.hash.replace(/^#/, ''));
   if (h.startsWith('compte/')) { openAccount(h.slice(7)); history.replaceState(null, '', '#a-faire'); }
   const r = parse();
@@ -2510,7 +2545,14 @@ window.addEventListener('hashchange', () => {
   state.renvoiOpen = false;
   render();
   closeNav();
-});
+}
+window.addEventListener('hashchange', onRoute);
+/* Pleine page ⇄ side peek : la fiche change de taille sous les yeux (View Transitions API ; dans Angular, withViewTransitions()).
+   Sans cette API, ou si les animations sont réduites, on change simplement de page. */
+function morphTo(hash) {
+  if (!document.startViewTransition || matchMedia('(prefers-reduced-motion: reduce)').matches) { location.hash = hash; return; }
+  document.startViewTransition(() => { history.pushState(null, '', hash); onRoute(); });
+}
 function autosize(t) { t.style.height = 'auto'; t.style.height = `${t.scrollHeight + 2}px`; }
 
 /* ---------- Messages ---------- */
@@ -2590,6 +2632,8 @@ function createAccount(form) {
 document.addEventListener('click', e => {
   const sel = e.target.closest('[data-sel]');
   if (sel) { state.prevSel = sel.dataset.sel; state.liOpen = false; }
+  const morph = e.target.closest('a[data-morph]');
+  if (morph && e.button === 0 && !(e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)) { e.preventDefault(); morphTo(morph.getAttribute('href')); return; }
   const opener = e.target.closest('[data-post]');
   if (opener && !opener.closest('.peek') && e.button === 0 && !(e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)) {
     const ctl = e.target.closest('a, button, input, select, textarea, label');
@@ -2607,7 +2651,7 @@ document.addEventListener('click', e => {
     case 'nav-close': closeNav(); break;
     case 'peek-close': closePeek(); break;
     case 'peek-prev': case 'peek-next': if (a.dataset.id) { peekFocus = a.dataset.action; location.replace(peekHref(a.dataset.id)); } break;
-    case 'peek-link': copyText(location.href, 'Lien du post copié.'); break;
+    case 'post-link': copyText(location.href, 'Lien du post copié.'); break;
     case 'reset-demo': { const v = state.viewer; TODAY = new Date(TODAY0); state = fresh(); state.viewer = v; state.draft = newDraft(v); } lastKey = null; render(); toast('Démo réinitialisée : retour aux données du 04/11/2026.', { kind: 'info' }); break;
     case 'toast-undo': { const f = undoFn; toasts.innerHTML = ''; undoFn = null; if (f) f(); break; }
     case 'toast-close': toasts.innerHTML = ''; undoFn = null; break;
