@@ -981,6 +981,42 @@ input[type="radio"] { width: 16px; height: 16px; margin: 2px 0 0; accent-color: 
 .schip { display: inline-flex; align-items: center; gap: var(--fd-space-2); height: 32px; padding: 0 var(--fd-space-3); border: 1px solid var(--fd-border); border-radius: 999px; background: var(--fd-surface); }
 .schip .serie { font-size: var(--fd-text-sm); font-weight: var(--fd-font-weight-medium); color: var(--fd-text-1); }
 
+/* ---------- Panneau d'un post : la fiche s'ouvre à droite, par-dessus la liste ---------- */
+:root { --fd-peek-width: clamp(560px, calc(100vw - var(--fd-nav-width) - 360px), 760px); }
+.peek {
+  position: fixed; inset: 0 0 0 auto; z-index: 30;
+  display: flex; flex-direction: column;
+  width: var(--fd-peek-width);
+  background: var(--fd-surface); border-left: 1px solid var(--fd-border); box-shadow: var(--fd-shadow-lg);
+}
+.peek.is-entering { animation: peek-in var(--fd-dur) var(--fd-ease-out); }
+@keyframes peek-in { from { opacity: 0; transform: translateX(40px); } }
+.peek__bar { flex: none; display: flex; align-items: center; gap: 2px; height: 52px; padding: 0 var(--fd-space-3); border-bottom: 1px solid var(--fd-border-2); }
+.peek__bar .icon-btn .ic { width: 20px; height: 20px; }
+.peek__bar .icon-btn:disabled { color: var(--fd-gray-300); background: none; cursor: default; }
+.peek__sep { width: 1px; height: 20px; margin: 0 6px; background: var(--fd-border); }
+.peek__copy { margin-left: auto; }
+.peek__body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0 var(--fd-space-6) var(--fd-space-8); }
+.peek__body:focus { outline: none; }
+.peek .panel { padding: var(--fd-space-5) 0; border: 0; border-top: 1px solid var(--fd-border-2); border-radius: 0; background: none; }
+.peek .panel:first-child { border-top: 0; padding-top: var(--fd-space-6); }
+.peek .fhead__top { flex-direction: column; align-items: stretch; }
+/* Le post ouvert dans le panneau, repéré dans la liste derrière */
+.table tbody tr.is-peeked { background: var(--fd-accent-50); }
+.table tr.is-peeked .tlink, .row--link.is-peeked .row__title, .next__title a.is-peeked, .spost__title.is-peeked { color: var(--fd-brand-hover); }
+.row--link.is-peeked, .fev.is-peeked, .spost:has(.spost__title.is-peeked) { background: var(--fd-accent-50); }
+/* Les messages s'affichent au milieu du panneau, là où l'action a eu lieu. */
+body:has(.peek) .toast-zone { left: calc(100% - var(--fd-peek-width) / 2); }
+@media (max-width: 1100px) {
+  :root { --fd-peek-width: min(720px, calc(100vw - 48px)); }
+}
+@media (max-width: 680px) {
+  :root { --fd-peek-width: 100vw; }
+  .peek { inset: 0; width: auto; border-left: 0; }
+  .peek__body { padding: 0 var(--fd-space-4) var(--fd-space-8); }
+  .peek__full, .peek__full + .peek__sep { display: none; }
+}
+
 /* ---------- Adaptation ---------- */
 @media (max-width: 1360px) {
   .main { padding-left: var(--fd-space-6); padding-right: var(--fd-space-6); }
@@ -1182,6 +1218,8 @@ input[type="radio"] { width: 16px; height: 16px; margin: 2px 0 0; accent-color: 
   <symbol id="i-event" viewBox="0 -960 960 960"><path d="M509-269q-29-29-29-71t29-71q29-29 71-29t71 29q29 29 29 71t-29 71q-29 29-71 29t-71-29ZM200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-40q0-17 11.5-28.5T280-880q17 0 28.5 11.5T320-840v40h320v-40q0-17 11.5-28.5T680-880q17 0 28.5 11.5T720-840v40h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Z"/></symbol>
   <symbol id="i-event_note" viewBox="0 -960 960 960"><path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-40q0-17 11.5-28.5T280-880q17 0 28.5 11.5T320-840v40h320v-40q0-17 11.5-28.5T680-880q17 0 28.5 11.5T720-840v40h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Zm120 240q-17 0-28.5-11.5T280-440q0-17 11.5-28.5T320-480h320q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400H320Zm0 160q-17 0-28.5-11.5T280-280q0-17 11.5-28.5T320-320h200q17 0 28.5 11.5T560-280q0 17-11.5 28.5T520-240H320Z"/></symbol>
   <symbol id="i-expand_more" viewBox="0 -960 960 960"><path d="M465-364.5q-7-2.5-13-8.5L268-557q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-373q-6 6-13 8.5t-15 2.5q-8 0-15-2.5Z"/></symbol>
+  <symbol id="i-expand_less" viewBox="0 -960 960 960"><path transform="rotate(180 480 -480)" d="M465-364.5q-7-2.5-13-8.5L268-557q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-373q-6 6-13 8.5t-15 2.5q-8 0-15-2.5Z"/></symbol>
+  <symbol id="i-open_in_full" viewBox="0 -960 960 960"><path d="M160-120q-17 0-28.5-11.5T120-160v-240q0-17 11.5-28.5T160-440q17 0 28.5 11.5T200-400v144l504-504H560q-17 0-28.5-11.5T520-800q0-17 11.5-28.5T560-840h240q17 0 28.5 11.5T840-800v240q0 17-11.5 28.5T800-520q-17 0-28.5-11.5T760-560v-144L256-200h144q17 0 28.5 11.5T440-160q0 17-11.5 28.5T400-120H160Z"/></symbol>
   <symbol id="i-fact_check" viewBox="0 -960 960 960"><path d="M160-120q-33 0-56.5-23.5T80-200v-560q0-33 23.5-56.5T160-840h640q33 0 56.5 23.5T880-760v560q0 33-23.5 56.5T800-120H160Zm0-80h640v-560H160v560Zm200-80q17 0 28.5-11.5T400-320q0-17-11.5-28.5T360-360H240q-17 0-28.5 11.5T200-320q0 17 11.5 28.5T240-280h120Zm222-193-29-29q-12-12-28-11.5T497-501q-11 12-11.5 28t11.5 28l57 57q12 12 28 12t28-12l142-142q12-12 12-28t-12-28q-12-12-28.5-12T695-586L582-473Zm-222 33q17 0 28.5-11.5T400-480q0-17-11.5-28.5T360-520H240q-17 0-28.5 11.5T200-480q0 17 11.5 28.5T240-440h120Zm0-160q17 0 28.5-11.5T400-640q0-17-11.5-28.5T360-680H240q-17 0-28.5 11.5T200-640q0 17 11.5 28.5T240-600h120ZM160-200v-560 560Z"/></symbol>
   <symbol id="i-filter_list" viewBox="0 -960 960 960"><path d="M440-240q-17 0-28.5-11.5T400-280q0-17 11.5-28.5T440-320h80q17 0 28.5 11.5T560-280q0 17-11.5 28.5T520-240h-80ZM280-440q-17 0-28.5-11.5T240-480q0-17 11.5-28.5T280-520h400q17 0 28.5 11.5T720-480q0 17-11.5 28.5T680-440H280ZM160-640q-17 0-28.5-11.5T120-680q0-17 11.5-28.5T160-720h640q17 0 28.5 11.5T840-680q0 17-11.5 28.5T800-640H160Z"/></symbol>
   <symbol id="i-forum" viewBox="0 -960 960 960"><path d="M840-136q-8 0-15-3t-13-9l-92-92H320q-33 0-56.5-23.5T240-320v-40h440q33 0 56.5-23.5T760-440v-280h40q33 0 56.5 23.5T880-640v463q0 18-12 29.5T840-136ZM160-473l47-47h393v-280H160v327Zm-40 137q-16 0-28-11.5T80-377v-423q0-33 23.5-56.5T160-880h440q33 0 56.5 23.5T680-800v280q0 33-23.5 56.5T600-440H240l-92 92q-6 6-13 9t-15 3Zm40-184v-280 280Z"/></symbol>
@@ -1837,7 +1875,7 @@ function viewTodo() {
   }
   const up = upcomingOf(acc);
   const myNext = up.find(p => p.assignees.includes(me));
-  if (myNext && myNext.status === 'BROUILLON' && daysBetween(TODAY, D(myNext.date)) <= 7) alerts.push(`<div class="alert alert--info">${ic('edit_note')}<div class="alert__text"><strong>Votre prochain post du ${dmy(D(myNext.date))} est encore en brouillon.</strong></div><a class="btn btn--sm" href="#post/${myNext.id}">Ouvrir le post</a></div>`);
+  if (myNext && myNext.status === 'BROUILLON' && daysBetween(TODAY, D(myNext.date)) <= 7) alerts.push(`<div class="alert alert--info">${ic('edit_note')}<div class="alert__text"><strong>Votre prochain post du ${dmy(D(myNext.date))} est encore en brouillon.</strong></div><a class="btn btn--sm" href="${peekHref(myNext.id)}" data-post="${myNext.id}">Ouvrir le post</a></div>`);
 
   const nx = up[0];
   const isMine = nx && nx.assignees.includes(me);
@@ -1845,9 +1883,9 @@ function viewTodo() {
     ? `<span class="tag tag--me">${ic('person')}Assigné à vous</span>`
     : `<span class="tag">${ic('person')}${nx.assignees.length ? `Assigné à ${esc(namesOf(nx.assignees))}` : 'Personne n’est assigné'}</span>`;
   const nextPanel = nx ? `<section class="panel" aria-labelledby="next-t">
-      <header class="panel__head">${ic('event', 'panel__icon')}<h2 class="panel__title" id="next-t">Prochain post</h2>${forWho}<a class="panel__link" href="#post/${nx.id}">Ouvrir${ic('arrow_forward')}</a></header>
+      <header class="panel__head">${ic('event', 'panel__icon')}<h2 class="panel__title" id="next-t">Prochain post</h2>${forWho}<a class="panel__link" href="${peekHref(nx.id)}" data-post="${nx.id}">Ouvrir${ic('arrow_forward')}</a></header>
       <div class="next">
-        <h3 class="next__title"><a href="#post/${nx.id}">${esc(nx.title)}</a></h3>
+        <h3 class="next__title"><a href="${peekHref(nx.id)}" data-post="${nx.id}">${esc(nx.title)}</a></h3>
         <p class="meta">${serie(nx.serie)}<span class="sep">·</span>${pill(nx.status, true)}<span class="sep">·</span><span class="tnum">${when(nx)}</span></p>
       </div>
       ${pathHTML(nx)}
@@ -1858,7 +1896,7 @@ function viewTodo() {
   const toggle = `<div class="seg seg--sm" role="group" aria-label="Posts affichés"><button class="seg__btn" type="button" data-action="mine" data-v="1" aria-pressed="${state.mine}">Les miens</button><button class="seg__btn" type="button" data-action="mine" data-v="0" aria-pressed="${!state.mine}">Tous</button></div>`;
   const laterPanel = nx ? `<section class="panel" aria-labelledby="later-t">
       <header class="panel__head">${ic('event_note', 'panel__icon')}<h2 class="panel__title" id="later-t">${state.mine ? 'Mes posts suivants' : 'Posts suivants'}</h2>${toggle}</header>
-      ${list.length ? `<ul class="rows">${list.map(p => `<li><a class="row row--link" href="#post/${p.id}"><span class="due tnum">${shortD(D(p.date))}</span><span class="row__main"><span class="row__title">${esc(p.title)}</span>${serie(p.serie)}</span>${state.mine ? '' : avmini(p.assignees)}${pill(p.status, true)}</a></li>`).join('')}</ul>`
+      ${list.length ? `<ul class="rows">${list.map(p => `<li><a class="row row--link" href="${peekHref(p.id)}" data-post="${p.id}"><span class="due tnum">${shortD(D(p.date))}</span><span class="row__main"><span class="row__title">${esc(p.title)}</span>${serie(p.serie)}</span>${state.mine ? '' : avmini(p.assignees)}${pill(p.status, true)}</a></li>`).join('')}</ul>`
         : `<p class="nothing">${icf('check_circle')}<span>${state.mine ? 'Aucun autre post ne vous est assigné.' : 'Aucun autre post planifié.'}</span></p>`}
       <a class="panel__foot-link" href="#calendrier">Voir le calendrier${ic('arrow_forward')}</a>
     </section>` : '';
@@ -1896,7 +1934,7 @@ function viewCalendar() {
       const out = d.getMonth() !== m, today = key === iso(TODAY);
       tds += `<td class="${out ? 'is-out' : ''} ${today ? 'is-today' : ''}">
         <div class="fcal__n"><span ${today ? 'aria-current="date"' : ''}>${d.getDate()}</span></div>
-        ${list.slice(0, 3).map(p => `<a class="fev st-${p.status}" href="#post/${p.id}" title="${esc(p.title)} · ${STATUS[p.status].label} · ${esc(namesOf(p.assignees))}"><i class="fev__dot" aria-hidden="true"></i><span class="fev__t">${esc(p.title)}</span><span class="sr-only">, ${STATUS[p.status].label}</span></a>`).join('')}
+        ${list.slice(0, 3).map(p => `<a class="fev st-${p.status}" href="${peekHref(p.id)}" data-post="${p.id}" title="${esc(p.title)} · ${STATUS[p.status].label} · ${esc(namesOf(p.assignees))}"><i class="fev__dot" aria-hidden="true"></i><span class="fev__t">${esc(p.title)}</span><span class="sr-only">, ${STATUS[p.status].label}</span></a>`).join('')}
         ${list.length > 3 ? `<span class="fmore">+${list.length - 3}</span>` : ''}
       </td>`;
     }
@@ -1952,10 +1990,10 @@ function viewPosts() {
   const rows = list.map(p => {
     const st = stepNow(p);
     const d = D(p.date);
-    return `<tr class="is-link" data-href="#post/${p.id}">
+    return `<tr class="is-link" data-href="${peekHref(p.id)}" data-post="${p.id}">
       <td class="tdate">${DOW[d.getDay()]} ${dmy(d)}</td>
       <td>${serie(p.serie)}</td>
-      <td><a class="tlink" href="#post/${p.id}">${esc(p.title)}</a></td>
+      <td><a class="tlink" href="${peekHref(p.id)}" data-post="${p.id}">${esc(p.title)}</a></td>
       <td>${pill(p.status, true)}</td>
       <td><span class="tstep is-${st.st}">${ic(st.st === 'done' ? 'check_circle' : st.st === 'late' ? 'warning' : st.st === 'current' ? 'radio_button_unchecked' : 'schedule')}${esc(st.text)}</span></td>
       <td class="col-assign">${avstack(p)}</td>
@@ -2008,10 +2046,12 @@ function feedHTML(p) {
     </div>
   </section>`;
 }
+/* Quand la routine passe : à sa date si elle est à venir, sinon à son prochain passage. */
+const routineWhen = p => daysBetween(TODAY, dates(p).j7) >= 0 ? `le ${shortD(dates(p).j7)}` : 'à son prochain passage';
 function textHTML(p) {
   const locked = ['PROGRAMME', 'PUBLIE'].includes(p.status);
   const br = checks(p).find(x => x.key === 'brackets');
-  const ph = A().routine ? `La routine rédige le texte le ${shortD(dates(p).j7)}. Vous pouvez aussi l’écrire vous-même.` : 'Écrivez le texte du post.';
+  const ph = A().routine ? `La routine rédige le texte ${routineWhen(p)}. Vous pouvez aussi l’écrire vous-même.` : 'Écrivez le texte du post.';
   return `<section class="panel" id="sec-texte" aria-labelledby="texte-t" tabindex="-1">
     <header class="panel__head">${ic('edit_note', 'panel__icon')}<h3 class="panel__title" id="texte-t">Texte</h3><span class="counter ${p.text.length > 3000 ? 'is-over' : ''}" id="count-${p.id}" aria-live="polite">${fmtN(p.text.length)} / 3 000 caractères</span></header>
     <label class="sr-only" for="text-${p.id}">Texte du post</label>
@@ -2039,7 +2079,7 @@ function coverHTML(p) {
     </div>
     <div class="cprompt">
       <div class="cprompt__head"><label class="sub" for="prompt-${p.id}">Prompt de l’image</label><button class="btn btn--sm" type="button" data-action="copy-prompt" data-id="${p.id}" ${p.prompt.trim() ? '' : 'disabled'}>${ic('content_copy')}Copier le prompt</button></div>
-      <textarea class="textarea" id="prompt-${p.id}" data-input="prompt" data-id="${p.id}" placeholder="${esc(A().routine ? `La routine écrira le prompt le ${shortD(dates(p).j7)}. Vous pouvez aussi l’écrire vous-même.` : 'Écrivez le prompt qui servira à créer l’image.')}" ${locked ? 'readonly' : ''}>${esc(p.prompt)}</textarea>
+      <textarea class="textarea" id="prompt-${p.id}" data-input="prompt" data-id="${p.id}" placeholder="${esc(A().routine ? `Écrivez ici le prompt de l’image. Sinon, la routine le proposera ${routineWhen(p)}.` : 'Écrivez ici le prompt qui servira à créer l’image.')}" ${locked ? 'readonly' : ''}>${esc(p.prompt)}</textarea>
     </div>
   </section>`;
 }
@@ -2062,14 +2102,10 @@ function headerActions(p) {
   if (p.status === 'PUBLIE') return '';
   return preview(true);
 }
-function viewPost(id) {
-  const p = post(id);
-  if (!p) return `<div class="empty-wide"><svg class="mark" aria-hidden="true"><use href="#mark"/></svg><strong>Ce post n’existe pas dans ce compte.</strong><p>Il a peut-être été supprimé. Retrouvez tous les posts dans la liste.</p><a class="btn" href="#posts">Voir les posts</a></div>`;
+function fheadHTML(p) {
   const locked = ['PROGRAMME', 'PUBLIE'].includes(p.status);
   const flash = state.flash === p.id ? 'is-arrived' : '';
-  return `<div class="stack">
-    <a class="back" href="${backTo.hash}">${ic('arrow_back')}${backTo.label}</a>
-    <section class="panel fhead" aria-labelledby="post-title">
+  return `<section class="panel fhead" aria-labelledby="post-title">
       <div class="fhead__top">
         <div class="fhead__main">
           <h2 class="fhead__title" id="post-title" tabindex="-1">${esc(p.title)}</h2>
@@ -2087,13 +2123,66 @@ function viewPost(id) {
         <div class="fhead__actions">${headerActions(p)}</div>
       </div>
       <div class="fhead__path">${pathHTML(p)}</div>
-    </section>
+    </section>`;
+}
+const NO_POST = `<div class="empty-wide"><svg class="mark" aria-hidden="true"><use href="#mark"/></svg><strong>Ce post n’existe pas dans ce compte.</strong><p>Il a peut-être été supprimé. Retrouvez tous les posts dans la liste.</p><a class="btn" href="#posts">Voir les posts</a></div>`;
+function viewPost(id) {
+  const p = post(id);
+  if (!p) return NO_POST;
+  return `<div class="stack">
+    <a class="back" href="${backTo.hash}">${ic('arrow_back')}${backTo.label}</a>
+    ${fheadHTML(p)}
     <div class="fbody">
       <div class="stack">${textHTML(p)}${coverHTML(p)}</div>
       <aside class="fbody__side">${feedHTML(p)}</aside>
     </div>
   </div>`;
 }
+
+/* ---------- Panneau d'un post : la même fiche, ouverte à droite de la liste ---------- */
+function peekHTML(id) {
+  const p = post(id);
+  const bar = `<div class="peek__bar">
+      <button class="icon-btn" type="button" data-action="peek-close" aria-label="Fermer la fiche" title="Fermer (Échap)">${ic('close')}</button>
+      ${p ? `<a class="icon-btn peek__full" href="#post/${p.id}" aria-label="Ouvrir en pleine page" title="Ouvrir en pleine page">${ic('open_in_full')}</a>` : ''}
+      <span class="peek__sep" aria-hidden="true"></span>
+      <button class="icon-btn" type="button" data-action="peek-prev" aria-label="Post précédent" disabled>${ic('expand_less')}</button>
+      <button class="icon-btn" type="button" data-action="peek-next" aria-label="Post suivant" disabled>${ic('expand_more')}</button>
+      ${p ? `<button class="icon-btn peek__copy" type="button" data-action="peek-link" aria-label="Copier le lien du post" title="Copier le lien du post">${ic('link')}</button>` : ''}
+    </div>`;
+  const body = p ? `${fheadHTML(p)}${textHTML(p)}${coverHTML(p)}${feedHTML(p)}` : NO_POST;
+  return `<aside class="peek" id="peek" role="dialog" aria-modal="false" ${p ? 'aria-labelledby="post-title"' : 'aria-label="Fiche du post"'}>
+    ${bar}
+    <div class="peek__body" id="peek-body">${body}</div>
+  </aside>`;
+}
+/* Précédent / suivant suivent l'ordre de la liste affichée derrière le panneau. */
+function syncPeek(r) {
+  if (!r.peek) return;
+  const ids = [];
+  view.querySelectorAll('[data-post]').forEach(el => {
+    if (el.closest('.peek')) return;
+    if (!ids.includes(el.dataset.post)) ids.push(el.dataset.post);
+    if (el.dataset.post === r.peek) { el.classList.add('is-peeked'); if (el.matches('a')) el.setAttribute('aria-current', 'true'); }
+  });
+  const i = ids.indexOf(r.peek);
+  const set = (action, id, label) => {
+    const b = view.querySelector(`.peek [data-action="${action}"]`);
+    const q = id ? post(id) : null;
+    if (!b) return;
+    b.disabled = !q;
+    b.dataset.id = q ? q.id : '';
+    b.setAttribute('aria-label', q ? `${label} : ${q.title}` : label);
+    b.title = q ? `${label} : ${q.title}` : '';
+  };
+  set('peek-prev', i > 0 ? ids[i - 1] : null, 'Post précédent');
+  set('peek-next', i >= 0 && i < ids.length - 1 ? ids[i + 1] : null, 'Post suivant');
+}
+function openPeek(id) {
+  const href = peekHref(id);
+  if (route.peek) location.replace(href); else location.hash = href;
+}
+function closePeek() { if (route.peek) location.hash = `#${route.name}`; }
 
 /* ---------- Vue : Aperçu (le validateur regarde, valide, programme) ---------- */
 function liText(t) {
@@ -2161,7 +2250,7 @@ function viewPreview() {
       <aside class="val__side">
         <section class="panel" aria-labelledby="vs-t">
           <div class="vsum">
-            <h3 class="vsum__title" id="vs-t"><a href="#post/${p.id}">${esc(p.title)}</a></h3>
+            <h3 class="vsum__title" id="vs-t"><a href="${peekHref(p.id)}" data-post="${p.id}">${esc(p.title)}</a></h3>
             <p class="meta">${pill(p.status, true, flash)}${serie(p.serie)}<span class="sep">·</span><span class="tnum">${when(p)}</span></p>
           </div>
           <div class="vdecide">${ctrl}${box}${act}</div>
@@ -2180,7 +2269,7 @@ function seriePostRows(list) {
   if (!list.length) return '<p class="hint serie-empty">Aucun post dans cette série.</p>';
   return `<ul class="sposts">${list.map(p => `<li class="spost">
       <span class="due tnum">${shortD(D(p.date))}</span>
-      <a class="spost__title" href="#post/${p.id}">${esc(p.title)}</a>
+      <a class="spost__title" href="${peekHref(p.id)}" data-post="${p.id}">${esc(p.title)}</a>
       ${avmini(p.assignees)}${pill(p.status, true)}
       <span class="selectwrap"><label class="sr-only" for="ms-${p.id}">Série de « ${esc(p.title)} »</label><select class="select select--sm" id="ms-${p.id}" data-change="move-serie" data-id="${p.id}">${serieOptions(p.serie)}</select>${ic('expand_more')}</span>
     </li>`).join('')}</ul>`;
@@ -2315,19 +2404,34 @@ function copyText(t, okMsg) {
 /* ---------- Rendu et navigation ---------- */
 const view = document.getElementById('view');
 const ROUTES = ['comptes', 'nouveau-compte', 'a-faire', 'calendrier', 'posts', 'series', 'apercu', 'reglages'];
+/* Le panneau d'un post s'ouvre par-dessus ces vues : #posts?post=<id>. La page entière reste à #post/<id>. */
+const PEEK_ROUTES = ['a-faire', 'calendrier', 'posts', 'series', 'apercu', 'reglages'];
+let route = { name: 'comptes', peek: null };
+let lastPeek = '';
+let peekFocus = null;
+const peekHref = id => `#${PEEK_ROUTES.includes(route.name) ? route.name : 'posts'}?post=${encodeURIComponent(id)}`;
 function parse() {
   let h = decodeURIComponent(location.hash.replace(/^#/, ''));
+  const q = h.indexOf('?');
+  const peek = q >= 0 ? new URLSearchParams(h.slice(q + 1)).get('post') : null;
+  if (q >= 0) h = h.slice(0, q);
   if (h === 'a-valider') h = 'apercu';
-  if (h.startsWith('post/')) return { name: 'post', id: h.slice(5) };
-  return { name: ROUTES.includes(h) ? h : 'comptes' };
+  if (h.startsWith('post/')) return { name: 'post', id: h.slice(5), peek: null };
+  const name = ROUTES.includes(h) ? h : 'comptes';
+  return { name, peek: peek && PEEK_ROUTES.includes(name) ? peek : null };
 }
 const TITLES = { comptes: 'Comptes LinkedIn', 'nouveau-compte': 'Nouveau compte', 'a-faire': 'À faire', calendrier: 'Calendrier', posts: 'Posts', series: 'Séries', apercu: 'Aperçu', reglages: 'Réglages' };
 function render() {
   const r = parse();
+  route = r;
   const key = state.cur + r.name + (r.id || '');
   const changed = key !== lastKey;
+  const prevPeek = lastPeek;
+  const peekChanged = (r.peek || '') !== prevPeek;
+  lastPeek = r.peek || '';
   const ae = document.activeElement;
-  const keep = !changed && ae && ae.id && view.contains(ae) ? { id: ae.id, s: ae.selectionStart, e: ae.selectionEnd } : null;
+  const keep = !changed && !peekChanged && ae && ae.id && view.contains(ae) ? { id: ae.id, s: ae.selectionStart, e: ae.selectionEnd } : null;
+  const peekScroll = !changed && !peekChanged ? document.getElementById('peek-body')?.scrollTop : null;
   renderHeader(r);
   let html;
   if (r.name === 'comptes') html = viewAccounts();
@@ -2339,10 +2443,13 @@ function render() {
   else if (r.name === 'apercu') html = viewPreview();
   else if (r.name === 'reglages') html = viewSettings();
   else html = viewTodo();
+  if (r.peek) html += peekHTML(r.peek);
   view.innerHTML = html;
-  const p = r.name === 'post' ? post(r.id) : null;
+  syncPeek(r);
+  const p = r.name === 'post' ? post(r.id) : r.peek ? post(r.peek) : null;
   const global = ['comptes', 'nouveau-compte'].includes(r.name);
   document.title = `${p ? p.title : TITLES[r.name]}${global ? '' : ` · ${A().name}`} · LinkedIn · FlowDesk`;
+  const peekTitle = () => { const t = document.getElementById('post-title') || document.getElementById('peek-body'); t.setAttribute('tabindex', '-1'); t.focus({ preventScroll: true }); };
   if (changed) {
     const first = lastKey === null;
     lastKey = key;
@@ -2352,16 +2459,31 @@ function render() {
       if (el) { el.scrollIntoView({ block: 'start' }); el.focus({ preventScroll: true }); return; }
     }
     window.scrollTo(0, 0);
-    if (!first) { const h = view.querySelector('#post-title, #val-title') || document.getElementById('mod-title') || view; h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
+    if (!first) {
+      if (r.peek) peekTitle();
+      else { const h = view.querySelector('#post-title, #val-title') || document.getElementById('mod-title') || view; h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
+    }
+  } else if (peekChanged) {
+    if (r.peek) {
+      if (!prevPeek) document.getElementById('peek').classList.add('is-entering');
+      const nav = peekFocus && view.querySelector(`.peek [data-action="${peekFocus}"]:not(:disabled)`);
+      if (nav) nav.focus({ preventScroll: true }); else peekTitle();
+      view.querySelector('.is-peeked')?.scrollIntoView({ block: 'nearest' });
+    } else {
+      const back = [...view.querySelectorAll('a[data-post]')].find(el => el.dataset.post === prevPeek);
+      (back || view).focus({ preventScroll: true });
+    }
   } else if (keep) {
     const el = document.getElementById(keep.id);
     if (el) { el.focus({ preventScroll: true }); try { if (keep.s != null) el.setSelectionRange(keep.s, keep.e); } catch (e) { /* champ sans sélection */ } }
   }
+  peekFocus = null;
   view.querySelectorAll('.textarea--post').forEach(autosize);
   view.querySelectorAll('.li__body.is-folded').forEach(b => {
     const t = b.querySelector('.li__text');
     if (t && t.scrollHeight <= t.clientHeight + 2) { b.classList.remove('is-folded'); b.querySelector('.li__more')?.remove(); b.querySelector('.li__fold')?.remove(); }
   });
+  if (peekScroll != null) { const b = document.getElementById('peek-body'); if (b) b.scrollTop = peekScroll; }
   if (state.flash) { const f = state.flash; setTimeout(() => { if (state.flash === f) state.flash = null; }, 1700); }
 }
 function openAccount(id) {
@@ -2380,7 +2502,7 @@ window.addEventListener('hashchange', () => {
   const r = parse();
   if (r.name !== 'post') {
     const labels = { 'a-faire': 'Retour à « À faire »', calendrier: 'Retour au calendrier', posts: 'Retour aux posts', series: 'Retour aux séries', apercu: 'Retour à l’aperçu', reglages: 'Retour aux réglages' };
-    if (labels[r.name]) backTo = { hash: `#${r.name}`, label: labels[r.name] };
+    if (labels[r.name]) backTo = { hash: r.peek ? `#${r.name}?post=${encodeURIComponent(r.peek)}` : `#${r.name}`, label: labels[r.name] };
   }
   state.renvoiOpen = false;
   render();
@@ -2465,6 +2587,12 @@ function createAccount(form) {
 document.addEventListener('click', e => {
   const sel = e.target.closest('[data-sel]');
   if (sel) { state.prevSel = sel.dataset.sel; state.liOpen = false; }
+  const opener = e.target.closest('[data-post]');
+  if (opener && !opener.closest('.peek') && e.button === 0 && !(e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)) {
+    const ctl = e.target.closest('a, button, input, select, textarea, label');
+    if (!ctl || ctl.dataset.post) { e.preventDefault(); openPeek(opener.dataset.post); return; }
+  }
+  if (route.peek && e.target.closest('.main') && !e.target.closest('.peek, a, button, input, select, textarea, label, [role="tab"]') && window.getSelection().isCollapsed) { closePeek(); return; }
   const row = e.target.closest('tr[data-href]');
   if (row && !e.target.closest('a, button, input, select, label')) { location.hash = row.dataset.href; return; }
   const a = e.target.closest('[data-action]');
@@ -2474,6 +2602,9 @@ document.addEventListener('click', e => {
   switch (a.dataset.action) {
     case 'nav-open': document.getElementById('nav').classList.add('is-open'); document.querySelector('.nav-scrim').hidden = false; a.setAttribute('aria-expanded', 'true'); break;
     case 'nav-close': closeNav(); break;
+    case 'peek-close': closePeek(); break;
+    case 'peek-prev': case 'peek-next': if (a.dataset.id) { peekFocus = a.dataset.action; location.replace(peekHref(a.dataset.id)); } break;
+    case 'peek-link': copyText(location.href, 'Lien du post copié.'); break;
     case 'reset-demo': { const v = state.viewer; TODAY = new Date(TODAY0); state = fresh(); state.viewer = v; state.draft = newDraft(v); } lastKey = null; render(); toast('Démo réinitialisée : retour aux données du 04/11/2026.', { kind: 'info' }); break;
     case 'toast-undo': { const f = undoFn; toasts.innerHTML = ''; undoFn = null; if (f) f(); break; }
     case 'toast-close': toasts.innerHTML = ''; undoFn = null; break;
@@ -2670,7 +2801,11 @@ document.addEventListener('keydown', e => {
     render();
     document.getElementById(state.feedTab === 'hist' ? 'ft-h' : 'ft-c')?.focus();
   }
-  if (e.key === 'Escape' && document.getElementById('nav').classList.contains('is-open')) closeNav();
+  if (e.key === 'Escape' && document.getElementById('nav').classList.contains('is-open')) { closeNav(); return; }
+  if (e.key === 'Escape' && route.peek && !dlg.open) {
+    if (t.closest && t.closest('.peek') && t.matches('input, textarea, select')) { e.preventDefault(); const h = document.getElementById('post-title'); if (h) { h.setAttribute('tabindex', '-1'); h.focus(); } return; }
+    closePeek();
+  }
 });
 document.addEventListener('submit', e => {
   const f = e.target;
