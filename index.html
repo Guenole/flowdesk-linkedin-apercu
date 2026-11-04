@@ -1029,8 +1029,17 @@ body:has(.peek) .toast-zone { left: calc(100% - var(--fd-peek-width) / 2); }
 .page__bar .crumbs > a, .page__bar .crumbs > .ic { flex: none; white-space: nowrap; }
 .page__bar .crumbs [aria-current] { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .page__copy { margin-left: auto; }
-.page__body { max-width: 880px; margin: 0 auto; padding: 0 var(--fd-space-8) 96px; }
+.page__layout { display: grid; grid-template-columns: minmax(0, 1fr) 380px; align-items: start; }
+.page__body { width: 100%; max-width: 880px; margin: 0 auto; padding: 0 var(--fd-space-8) 96px; }
 .page__body > .panel:first-child { padding-top: var(--fd-space-8); }
+/* Activité, comme dans ClickUp : une colonne collée à droite, sur toute la hauteur sous la barre.
+   La liste défile seule et le champ de commentaire reste en bas. */
+.page__side { position: sticky; top: 52px; display: flex; flex-direction: column; height: calc(100vh - 52px); border-left: 1px solid var(--fd-border); background: var(--fd-gray-50); }
+.page__side > .panel { flex: 1; min-height: 0; display: flex; flex-direction: column; padding: var(--fd-space-5) var(--fd-space-5) var(--fd-space-4); }
+.page__side [role="tabpanel"]:not([hidden]) { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.page__side .feed, .page__side .hist { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; margin-right: calc(var(--fd-space-2) * -1); padding-right: var(--fd-space-2); }
+.page__side .composer { flex: none; margin-top: auto; }
+.page__side .composer .textarea { background: var(--fd-surface); }
 /* Ouvrir en pleine page : le side peek s'agrandit jusqu'à devenir la page, et la flèche de retour fait l'inverse (View Transitions). */
 ::view-transition-group(post-sheet) { animation-duration: 360ms; animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1); overflow: clip; background: #fff; box-shadow: 0 12px 32px rgb(24 27 33 / 12%); }
 ::view-transition-old(post-sheet), ::view-transition-new(post-sheet) { height: 100%; object-fit: none; object-position: left top; }
@@ -1044,9 +1053,19 @@ body:has(.peek) .toast-zone { left: calc(100% - var(--fd-peek-width) / 2); }
 @media (max-width: 1100px) {
   .page { min-height: calc(100vh - 56px); }
   .page__bar { top: 56px; }
+  .page__layout { grid-template-columns: minmax(0, 1fr) 340px; }
+  .page__side { top: 108px; height: calc(100vh - 108px); }
+}
+@media (max-width: 960px) {
+  .page__layout { grid-template-columns: minmax(0, 1fr); }
+  .page__body { padding-bottom: 0; }
+  .page__side { position: static; height: auto; border-left: 0; background: none; }
+  .page__side > .panel { width: 100%; max-width: 880px; margin: 0 auto; padding: var(--fd-space-5) var(--fd-space-8) 96px; border-top: 1px solid var(--fd-border-2); }
+  .page__side .feed, .page__side .hist { overflow: visible; margin-right: 0; padding-right: 0; }
 }
 @media (max-width: 680px) {
-  .page__body { padding: 0 var(--fd-space-4) 96px; }
+  .page__body { padding: 0 var(--fd-space-4); }
+  .page__side > .panel { padding: var(--fd-space-5) var(--fd-space-4) 96px; }
   .page__bar .crumbs > a, .page__bar .crumbs > .ic { display: none; }
 }
 
@@ -2172,7 +2191,10 @@ function viewPost(id) {
       <nav class="crumbs" aria-label="Fil d’Ariane"><a href="#comptes">Comptes LinkedIn</a>${ic('chevron_right')}<a href="#a-faire">${esc(A().name)}</a>${ic('chevron_right')}<span aria-current="page">${esc(p.title)}</span></nav>
       <button class="icon-btn page__copy" type="button" data-action="post-link" aria-label="Copier le lien du post" title="Copier le lien du post">${ic('link')}</button>
     </div>
-    <div class="page__body">${fheadHTML(p, 1)}${textHTML(p)}${coverHTML(p)}${feedHTML(p)}</div>
+    <div class="page__layout">
+      <div class="page__body">${fheadHTML(p, 1)}${textHTML(p)}${coverHTML(p)}</div>
+      <div class="page__side">${feedHTML(p)}</div>
+    </div>
   </article>`;
 }
 
